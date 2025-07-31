@@ -1,0 +1,69 @@
+version: '3.9'
+
+services:
+  db:
+    image: postgres:15
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    environment:
+      POSTGRES_DB: ai_blog_db
+      POSTGRES_USER: ai_blog_user
+      POSTGRES_PASSWORD: ai_blog_pass
+    networks:
+      - blog_net
+
+  web-01:
+    build: .
+    command: sh -c "python manage.py migrate && python manage.py runserver 0.0.0.0:8080"
+    ports:
+      - "8081:8080"        # Expose different ports so they don't clash locally
+    depends_on:
+      - db
+    environment:
+      POSTGRES_DB: ai_blog_db
+      POSTGRES_USER: ai_blog_user
+      POSTGRES_PASSWORD: ai_blog_pass
+      POSTGRES_HOST: db
+      POSTGRES_PORT: 5432
+      SERVER_NAME: web-01
+    volumes:
+      - .:/app
+    networks:
+      - blog_net
+
+  web-02:
+    build: .
+    command: sh -c "python manage.py migrate && python manage.py runserver 0.0.0.0:8080"
+    ports:
+      - "8082:8080"
+    depends_on:
+      - db
+    environment:
+      POSTGRES_DB: ai_blog_db
+      POSTGRES_USER: ai_blog_user
+      POSTGRES_PASSWORD: ai_blog_pass
+      POSTGRES_HOST: db
+      POSTGRES_PORT: 5432
+      SERVER_NAME: web-02
+    volumes:
+      - .:/app
+    networks:
+      - blog_net
+
+  lb:
+    image: haproxy:2.4
+    ports:
+      - "80:80"
+    volumes:
+      - ./load_balancer/haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg:ro
+    depends_on:
+      - web-01
+      - web-02
+    networks:
+      - blog_net
+
+volumes:
+  postgres_data:
+
+networks:
+  blog_net:

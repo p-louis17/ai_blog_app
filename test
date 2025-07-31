@@ -1,0 +1,28 @@
+import yt_dlp
+import os
+
+def download_audio(link):
+    ydl_opts = {
+        'format': 'bestaudio/best',
+        'outtmpl': '%(id)s.%(ext)s',  # Save to current directory with video ID as filename
+        'postprocessors': [{
+            'key': 'FFmpegExtractAudio',
+            'preferredcodec': 'mp3',
+            'preferredquality': '192',
+        }],
+        'quiet': False,  # Show output for debugging
+        'no_warnings': False,
+    }
+    try:
+        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+            info_dict = ydl.extract_info(link, download=True)
+            filename = f"{info_dict['id']}.mp3"
+            print(f"Downloaded audio saved as: {filename}")
+            return filename
+    except Exception as e:
+        print(f"Download audio error: {e}")
+        return None
+
+if __name__ == "__main__":
+    test_link = "https://www.youtube.com/watch?v=BaW_jenozKc"  # This is a known test video
+    download_audio(test_link)
