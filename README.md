@@ -220,7 +220,7 @@ https://hub.docker.com/repository/docker/plouis17/ai_blog_web/general
 https://hub.docker.com/repository/docker/plouis17/ai_blog_haproxy/general
 
 📹 Demo Video
-https://www.youtube.com/watch?v=UJknByj9tfU
+https://youtu.be/UJknByj9tfU
 
 📄 API Used
 External API used for generating blog content.
